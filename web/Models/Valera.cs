@@ -4,6 +4,7 @@ namespace web.Models {
 
     public class Valera
     {
+        public int Id { get; set; }
         private bool is_alive = true;
         private int HP, MP, FT;
         private const int MaxCommonStats = 100, minCommonStats= 0;
