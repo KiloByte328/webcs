@@ -10,10 +10,10 @@ namespace web.Models {
         private const int MaxCommonStats = 100, minCommonStats= 0;
         private int CF, MN;
         private const int maxCF = 10, minCF = -10;
-        public Valera() { HP = MaxCommonStats; MP = FT = minCommonStats; MN = 0; CF = 0; }
+        public Valera() { HP = MaxCommonStats; MP = FT = minCommonStats; MN = 0; CF = 0; Id = Random.Shared.Next(1, 1000000); }
         public Valera(int hP, int mP, int fT, int cF, int mN)
         {
-            HP = hP; MP = mP; FT = fT; MN = mN; CF = cF;
+            HP = hP; MP = mP; FT = fT; MN = mN; CF = cF; Id = Random.Shared.Next(1, 1000000);
             stat_checker();
         }
 
@@ -107,6 +107,5 @@ namespace web.Models {
                 stat_checker();
             }
         }
-        static void Main(String[] args) { }
     }
 }
