@@ -4,8 +4,7 @@ using web.ValeraController;
 using Microsoft.EntityFrameworkCore;
 public class Program
 {
-    public static void Main(string[] args)
-    {
+    public static void Main(string[] args) {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddDbContext<web.Data.AppDbContext>(options =>
             options.UseInMemoryDatabase("ValeraDb"));
