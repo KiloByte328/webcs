@@ -24,12 +24,9 @@ public class Program
         var app = builder.Build();
         app.UseSwagger();
         app.UseSwaggerUI();
-        //app.UseSwagger(options =>
-        //{
-        //   options.SwaggerEndpoint();
-        //})
         app.UseHttpsRedirection();
         app.MapControllers();
+        app.MapGet("/", () => "Welcome to Valera API!");
         app.Run();
     }
 }

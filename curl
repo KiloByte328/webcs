@@ -1,1 +1,3 @@
+dotnet ef migrations add <name>
+dotnet ef database update
 curl -X POST https://localhost:63627/api/Valera -H "Content-Type: application/json" -d "{\"hp\": 50, \"mp\": 30, \"ft\": 20, \"cf\": 0, \"mn\": 100}" -o response.json
