@@ -14,19 +14,13 @@ namespace web.ValeraController
         {
             _valeraService = valeraService;
         }
-        [HttpGet]
+        [HttpGet("api/AllValeras")]
         public IActionResult GetValeras()
         {
             var valeras = _valeraService.GetAllValeras();
             return Ok(valeras);
         }
-        [HttpGet]
-        public IActionResult GetValeraStatus()
-        {
-            var valeras = _valeraService.GetAllValeras();
-            return Ok(valeras);
-        }
-        [HttpGet("{id}")]
+        [HttpGet("api/{id}")]
         public IActionResult GetValeraById(int id)
         {
             var valeras = _valeraService.GetAllValeras().FirstOrDefault(v => v.Id == id);
@@ -38,8 +32,9 @@ namespace web.ValeraController
 
         }
         [HttpPost]
-        public IActionResult CreateValera(Valera valera)
+        public IActionResult CreateValera([FromBody] Valera? valera)
         {
+            valera ??= new Valera();
             _valeraService.AddValeraToDb(valera);
             return CreatedAtAction(nameof(GetValeraById), new { id = valera.Id }, valera);
         }

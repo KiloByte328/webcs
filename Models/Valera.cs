@@ -1,29 +1,34 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace web.Models { 
 
     public class Valera
     {
         public int Id { get; set; }
-        private bool is_alive = true;
-        private int HP, MP, FT;
-        private const int MaxCommonStats = 100, minCommonStats= 0;
-        private int CF, MN;
-        private const int maxCF = 10, minCF = -10;
-        public Valera() { HP = MaxCommonStats; MP = FT = minCommonStats; MN = 0; CF = 0; Id = Random.Shared.Next(1, 1000000); }
+        [Required]
+        public bool is_alive { get; private set; } = true;
+
+        [Range(0, 100)]
+        public int HP { get; private set; } = 100;
+
+        [Range(0, 100)]
+        public int MP { get; private set; } = 0;
+
+        [Range(0, 100)]
+        public int FT { get; private set; } = 0;
+        public const int MaxCommonStats = 100, minCommonStats = 0;
+        [Range(-10, 10)]
+        public int CF { get; private set; } = 0;
+        [Range(0, int.MaxValue)]
+        public int MN { get; private set; } = 0;
+        public const int maxCF = 10, minCF = -10;
+        public Valera() { }
         public Valera(int hP, int mP, int fT, int cF, int mN)
         {
             HP = hP; MP = mP; FT = fT; MN = mN; CF = cF; Id = Random.Shared.Next(1, 1000000);
             stat_checker();
         }
-
-        public int get_HP() { return HP; }
-        public int get_MP() { return MP; }
-        public int get_FT() { return FT; }
-        public int get_CF() { return CF; }
-        public int get_MN() { return MN; }
-        public bool get_is_alive() { return is_alive; }
-
         private void stat_checker() {
             if (HP > MaxCommonStats) HP = MaxCommonStats;
             if (HP < minCommonStats) { HP = minCommonStats; is_alive = false; }
