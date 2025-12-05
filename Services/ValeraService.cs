@@ -1,4 +1,5 @@
-﻿using web.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using web.Data;
 using web.Models;
 
 namespace web.Service
@@ -8,25 +9,31 @@ namespace web.Service
         private readonly AppDbContext _context;
         public ValeraService(AppDbContext context)
         {
-            _context = context;
+            _context = context; 
         }
-        public IEnumerable<Valera> GetAllValeras()
+        public async Task<IEnumerable<Valera>> GetAllValeras()
         {
-            return _context.Valeras.ToList();
+            
+            return  await _context.Valeras.ToListAsync();
         }
-        public Valera? GetValeraById(int id)
+        public async Task<Valera?> GetValeraById(int id)
         {
-            return _context.Valeras.FirstOrDefault(v => v.Id == id);
+            return await _context.Valeras.FirstOrDefaultAsync(v => v.Id == id);
         }
-        public void AddValeraToDb(Valera valera)
+        public async Task AddValeraToDb(Valera valera)
         {
-            _context.Valeras.Add(valera);
-            _context.SaveChanges();
+            await _context.Valeras.AddAsync(valera);
+            await _context.SaveChangesAsync();
         }
-        public void UpdateValeraInDb(Valera valera)
+        public async Task UpdateValeraInDb(Valera valera)
         {
             _context.Valeras.Update(valera);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+        }
+        public async Task DeleteValera(Valera valera)
+        {
+            _context.Valeras.Remove(valera);
+            await _context.SaveChangesAsync();
         }
     }
 }

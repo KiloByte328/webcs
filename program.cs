@@ -7,8 +7,9 @@ public class Program
 {
     public static void Main(string[] args) {
         var builder = WebApplication.CreateBuilder(args);
-        builder.Services.AddDbContext<AppDbContext>(options =>
+        builder.Services.AddDbContextPool<AppDbContext>(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Services.AddScoped<AppDbContext>();
         builder.Services.AddScoped<ValeraService>();
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
@@ -21,12 +22,20 @@ public class Program
                 Description = "API для управления Валерой"
             });
         });
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowReact",
+                policy => policy
+                    .AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader());
+        });
         var app = builder.Build();
+        app.UseCors("AllowReact");
         app.UseSwagger();
         app.UseSwaggerUI();
         app.UseHttpsRedirection();
         app.MapControllers();
-        app.MapGet("/", () => "Welcome to Valera API!");
         app.Run();
     }
 }

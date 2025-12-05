@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using web.Service;
 using web.Models;
+using web.DTOs;
 
 namespace web.ValeraController
 {
@@ -14,16 +15,16 @@ namespace web.ValeraController
         {
             _valeraService = valeraService;
         }
-        [HttpGet("api/AllValeras")]
-        public IActionResult GetValeras()
+        [HttpGet("AllValeras")]
+        public async Task<IActionResult> GetValeras()
         {
-            var valeras = _valeraService.GetAllValeras();
+            var valeras = await _valeraService.GetAllValeras();
             return Ok(valeras);
         }
-        [HttpGet("api/{id}")]
-        public IActionResult GetValeraById(int id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetValeraById(int id)
         {
-            var valeras = _valeraService.GetAllValeras().FirstOrDefault(v => v.Id == id);
+            var valeras = await _valeraService.GetValeraById(id);
             if (valeras == null)
             {
                 return NotFound();
@@ -32,96 +33,130 @@ namespace web.ValeraController
 
         }
         [HttpPost]
-        public IActionResult CreateValera([FromBody] Valera? valera)
+        public async Task<IActionResult> CreateValera([FromBody] ValeraDTO valeraDto)
         {
-            valera ??= new Valera();
-            _valeraService.AddValeraToDb(valera);
+            Valera? valera = null;
+            if (valeraDto != null)
+            {
+                valera = new Valera
+                {
+                    Name = valeraDto.Name ?? "Valera",
+                    HP = valeraDto.HP ?? 100,
+                    MP = valeraDto.MP ?? 0,
+                    FT = valeraDto.FT ?? 0,
+                    CF = valeraDto.CF ?? 0,
+                    MN = valeraDto.MN ?? 0
+                };
+            }
+            if (valera == null)
+                valera = new Valera();
+            await _valeraService.AddValeraToDb(valera);
             return CreatedAtAction(nameof(GetValeraById), new { id = valera.Id }, valera);
         }
-        [HttpPost("{id}/work")]
-        public IActionResult ValeraGoToWork(int id)
+        [HttpGet]
+        public async Task<IActionResult> GetValeras([FromQuery] string? search)
         {
-            var valera = _valeraService.GetValeraById(id);
+            var valeras = await _valeraService.GetAllValeras();
+        
+            if (!string.IsNullOrEmpty(search))
+                valeras = valeras.Where(v => v.Name.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+        
+            return Ok(valeras);
+        }
+        [HttpPost("{id}/work")]
+        public async Task<IActionResult> ValeraGoToWork(int id)
+        {
+            var valera = await _valeraService.GetValeraById(id);
             if (valera == null)
             {
                 return NotFound();
             }
             valera.go_to_work();
-            _valeraService.UpdateValeraInDb(valera);
+            await _valeraService.UpdateValeraInDb(valera);
             return Ok(valera);
         }
         [HttpPost("{id}/touch_grass")]
-        public IActionResult ValeraGoToTouchGrass(int id)
+        public async Task<IActionResult> ValeraGoToTouchGrass(int id)
         {
-            var valera = _valeraService.GetValeraById(id);
+            var valera = await _valeraService.GetValeraById(id);
             if (valera == null)
             {
                 return NotFound();
             }
             valera.go_to_touch_grass();
-            _valeraService.UpdateValeraInDb(valera);
+            await _valeraService.UpdateValeraInDb(valera);
             return Ok(valera);
         }
         [HttpPost("{id}/cinema")]
-        public IActionResult ValeraGoToCinema(int id)
+        public async Task<IActionResult> ValeraGoToCinema(int id)
         {
-            var valera = _valeraService.GetValeraById(id);
+            var valera = await _valeraService.GetValeraById(id);
             if (valera == null)
             {
                 return NotFound();
             }
             valera.go_to_cinema();
-            _valeraService.UpdateValeraInDb(valera);
+            await _valeraService.UpdateValeraInDb(valera);
             return Ok(valera);
         }
         [HttpPost("{id}/go_to_pub")]
-        public IActionResult ValeraGoToPub(int id)
+        public async Task<IActionResult> ValeraGoToPub(int id)
         {
-            var valera = _valeraService.GetValeraById(id);
+            var valera = await _valeraService.GetValeraById(id);
             if (valera == null)
             {
                 return NotFound();
             }
             valera.go_to_pub();
-            _valeraService.UpdateValeraInDb(valera);
+            await _valeraService.UpdateValeraInDb(valera);
             return Ok(valera);
-
         }
         [HttpPost("{id}/sleep")]
-        public IActionResult ValeraGoToSleep(int id)
+        public async Task<IActionResult> ValeraGoToSleep(int id)
         {
-            var valera = _valeraService.GetValeraById(id);
+            var valera = await _valeraService.GetValeraById(id);
             if (valera == null)
             {
                 return NotFound();
             }
             valera.go_to_sleep();
-            _valeraService.UpdateValeraInDb(valera);
+            await _valeraService.UpdateValeraInDb(valera);
             return Ok(valera);
         }
         [HttpPost("{id}/sing_in_metro")]
-        public IActionResult ValeraGoSingInMetro(int id)
+        public async Task<IActionResult> ValeraGoSingInMetro(int id)
         {
-            var valera = _valeraService.GetValeraById(id);
+            var valera = await _valeraService.GetValeraById(id);
             if (valera == null)
             {
                 return NotFound();
             }
             valera.go_sing_in_metro();
-            _valeraService.UpdateValeraInDb(valera);
+            await _valeraService.UpdateValeraInDb(valera);
             return Ok(valera);
         }
         [HttpPost("{id}/go_to_drink_with")]
-        public IActionResult ValeraGoToDrinkWith(int id)
+        public async Task<IActionResult> ValeraGoToDrinkWith(int id)
         {
-            var valera = _valeraService.GetValeraById(id);
+            var valera = await _valeraService.GetValeraById(id);
             if (valera == null)
             {
                 return NotFound();
             }
             valera.go_to_drink_with();
-            _valeraService.UpdateValeraInDb(valera);
+            await _valeraService.UpdateValeraInDb(valera);
             return Ok(valera);
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteValera(int id)
+        {
+            var valera = await _valeraService.GetValeraById(id);
+            if (valera == null)
+            {
+                return NotFound();
+            }
+            await _valeraService.DeleteValera(valera);
+            return NoContent();
         }
     }
 }
