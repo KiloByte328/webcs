@@ -134,7 +134,7 @@ const LoginPage = () => {
 const HomePage = () => {
   const token = localStorage.getItem('jwtToken');
   if (!token) {
-        return <p>Загрузка...</p>; 
+      return LoginPage();
     }
   return (
   <div className="App">

@@ -34,8 +34,6 @@ api.interceptors.response.use(
   }
 );
 
-// --- API ФУНКЦИИ (ОСТАЮТСЯ ВНЕ КОМПОНЕНТА) ---
-
 async function get_all_valeras() {
   return api.get('/valera/AllValeras').then(res => res.data);
 }
