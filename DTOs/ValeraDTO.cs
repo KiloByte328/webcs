@@ -2,7 +2,8 @@ using web.Models;
 using web.Service;
 using web.Data;
 using web.ValeraController;
-using Microsoft.EntityFrameworkCore;    
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 
 // по сути это инварианты для передачи данных
 namespace web.DTOs
@@ -17,5 +18,17 @@ namespace web.DTOs
         public int? FT { get; set; }
         public int? CF { get; set; }
         public int? MN { get; set; }
+    }
+
+    public class RegisterDTO
+    {
+        public string Email { get; set; } = default!;
+        public string Password { get; set; } = default!;
+        public string Username { get; set; } = default!;
+    }
+    public class LoginDTO
+    {
+        public string Email { get; set; } = default!;
+        public string Password { get; set; } = default!;
     }
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { api } from './AllValera.jsx';
 
 function CreateValeraForm({ onValeraCreated }) {
   const [visible, setVisible] = useState(false);
@@ -13,7 +13,6 @@ function CreateValeraForm({ onValeraCreated }) {
   });
   const [message, setMessage] = useState('');
 
-  // обработчик изменения полей
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm(prev => ({
@@ -22,14 +21,13 @@ function CreateValeraForm({ onValeraCreated }) {
     }));
   };
 
-  // отправка формы через axios
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
 
     try {
-      const response = await axios.post(
-        'https://localhost:63627/api/Valera',
+      const response = await api.post(
+        '/Valera',
         form,
         {
           headers: {
@@ -37,15 +35,11 @@ function CreateValeraForm({ onValeraCreated }) {
           }
         }
       );
-
-      // axios автоматически парсит JSON
       const data = response.data;
       setMessage(`✅ Валера создан! ID: ${data.id}`);
 
-      // обновляем родительский компонент, если нужно
       onValeraCreated?.(data);
 
-      // сбрасываем форму
       setForm({
         name: '',
         hp: 100,

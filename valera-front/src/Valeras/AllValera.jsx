@@ -2,52 +2,82 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import ValeraStats from './ValeraStats';
 
-axios.defaults.baseURL = 'http://localhost:63628/api';
+const api = axios.create({baseURL:"https://localhost:63627/api"});
+
+api.interceptors.request.use( (config) => {
+  const token = localStorage.getItem('jwtToken');
+  
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+  },
+  (error) => {return Promise.reject(error);}
+) 
+ 
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response && (error.response.status === 301 || error.response.status === 302)) {
+      const redirectUrl = error.response.headers["location"];
+      if (redirectUrl) {
+        const token = localStorage.getItem("jwtToken");
+        return api({
+          method: error.config.method,
+          url: redirectUrl,
+          headers: { ...error.config.headers, Authorization: `Bearer ${token}` },
+          data: error.config.data
+        });
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 // --- API ФУНКЦИИ (ОСТАЮТСЯ ВНЕ КОМПОНЕНТА) ---
 
 async function get_all_valeras() {
-  return axios.get('/valera/AllValeras').then(res => res.data);
+  return api.get('/valera/AllValeras').then(res => res.data);
 }
 
 async function get_valera_by_id(id) {
-  return axios.get('/valera/' + id).then(res => res.data);
+  return api.get('/valera/' + id).then(res => res.data);
 }
 
 async function valera_works(id) {
-  return axios.post('/valera/' + id + '/work/').then(res => res.data);
+  return api.post('/valera/' + id + '/work/').then(res => res.data);
 }
 
 async function valera_drink(id) {
-  return axios.post('/valera/' + id + '/drink/').then(res => res.data);
+  return api.post('/valera/' + id + '/drink/').then(res => res.data);
 }
 
 async function valera_sleep(id) {
-  return axios.post('/valera/' + id + '/sleep/').then(res => res.data);
+  return api.post('/valera/' + id + '/sleep/').then(res => res.data);
 }
 
 async function valera_sing(id) {
-  return axios.post('/valera/' + id + '/sing_in_metro/').then(res => res.data);
+  return api.post('/valera/' + id + '/sing_in_metro/').then(res => res.data);
 }  
 
 async function valera_bar(id) {
-  return axios.post('/valera/' + id + '/go_to_pub/').then(res => res.data);
+  return api.post('/valera/' + id + '/go_to_pub/').then(res => res.data);
 }
 
 async function valera_touch_grass(id) {
-  return axios.post('/valera/' + id + '/touch_grass/').then(res => res.data);
+  return api.post('/valera/' + id + '/touch_grass/').then(res => res.data);
 }
 
 async function valera_friends(id) {
-  return axios.post('/valera/' + id + '/go_to_drink_with/').then(res => res.data);
+  return api.post('/valera/' + id + '/go_to_drink_with/').then(res => res.data);
 }
 
 async function valera_cinema(id) {
-  return axios.post('/valera/' + id + '/cinema/').then(res => res.data);
+  return api.post('/valera/' + id + '/cinema/').then(res => res.data);
 }
 
 async function delete_valera(id) {
-  return axios.delete('/valera/' + id).then(res => res.data);
+  return api.delete('/valera/' + id).then(res => res.data);
 }
 
 
@@ -75,8 +105,14 @@ function ValeraList() {
   }; 
 
   useEffect(() => {
-    fetchData(); // Вызываем fetchData для первоначальной загрузки
-  }, []); // Выполняется только один раз
+  fetchData();
+
+  // обновлять когда кто-то создаёт нового Валеру
+  const handler = () => fetchData();
+  window.addEventListener("valera:updated", handler);
+
+  return () => window.removeEventListener("valera:updated", handler);
+}, []);
 
   if (loading) return <div>Загрузка...</div>;
   else if (error && error !== "404") return <div>Ошибка при получении Валер: {error}</div>;
@@ -89,15 +125,21 @@ function ValeraList() {
       setSelectedValeraId(null);
   };
 
-  // Упрощение логики для отображения, когда валеры не найдены
+  // const HandleLogOut= () => {
+  //   localStorage.setItem('jwtToken', '');
+  //   useNavigatr('/login')
+  // }
+
   const showNoValerasMessage = valeras.length === 0 && !loading;
 
   return (
       <div> 
+        {/* <div>
+        <button onClick={HandleLogOut}>Разлогиниться?</button>
+        </div> */}
           <h2>Список Валер:</h2>
 
           {selectedValeraId !== null ? (
-              // --- ЭКРАН СТАТИСТИКИ (Если выбран ID) ---
               <div>
                   <button onClick={handleBackClick} style={{ marginBottom: '20px' }}>
                       ← Назад к списку
@@ -106,42 +148,36 @@ function ValeraList() {
                   <ValeraStats 
                       id={selectedValeraId} 
                       onBack={handleBackClick} 
-                      onDeleted={handleValeraDeleted} // ✅ Исправлено: передаем локальную функцию
+                      onDeleted={handleValeraDeleted}
                   /> 
               </div>
 
           ) : (
-              // --- ЭКРАН СПИСКА (Если selectedValeraId === null) ---
-              
               showNoValerasMessage ? (
-                  <div>Нет Валер 😢</div>
+                <div>Нет Валер 😢</div>
               ) : (
-                  valeras.map((v) => (
-                      <div 
-                          key={v.id} 
-                          className="valera-card" 
-                          style={{border: "1px solid black", margin: "10px", padding: "10px"}}>
-                          <button onClick={() => handleValeraSelect(v.id)}> 
-                              <strong>{v.name}</strong> — жив: {v.is_alive?  "Да" : "Нет"} HP: {v.hp} MP: {v.mp} Усталость: {v.ft} Жизнераость: {v.cf} Деньги: {v.mn}
-                          </button>
-                      </div>
-                  ))
+                valeras.map((v) => (
+                    <div 
+                        key={v.id} 
+                        className="valera-card" 
+                        style={{border: "1px solid black", margin: "10px", padding: "10px"}}>
+                        <button onClick={() => handleValeraSelect(v.id)}> 
+                            <strong>{v.name}</strong> — жив: {v.is_alive?  "Да" : "Нет"}
+                        </button>
+                    </div>
+                ))
               )
           )}
       </div>
   );
 }
 
-// --- ЭКСПОРТЫ ---
-
-// Функция fetchValeras, handleValeraCreated (если она нужна где-то еще, кроме этого файла)
-// Если она нужна, объявите ее как const и экспортируйте.
 const fetchValeras = () => get_all_valeras();
 const handleValeraCreated = () => { fetchValeras(); };
 
 export { 
     get_all_valeras, get_valera_by_id, valera_works, valera_sleep, valera_drink, 
     valera_sing, valera_touch_grass, valera_cinema, valera_friends, valera_bar, 
-    fetchValeras, handleValeraCreated, delete_valera 
+    fetchValeras, handleValeraCreated, delete_valera, api
 };
 export default ValeraList;

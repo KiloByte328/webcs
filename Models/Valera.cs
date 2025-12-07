@@ -1,7 +1,30 @@
 ﻿using System;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
 namespace web.Models { 
+
+    public class UserModel
+    {
+        [Required]
+        public string Email { get; set; } = default!;
+        [Required, EmailAddress]
+        public string Password { get; set; } = default!;
+        [Required]
+        public string Username { get; set; } = default!;
+    }
+
+    public interface IJwtService
+    {
+        Task<string> GenerateToken(IdentityUser user); 
+        // Task<TokenResponse> GenerateTokenWithExpiry(IdentityUser user);
+    }
+
+        public class TokenResponse
+    {
+        public string Token { get; set; } = default!;
+        public DateTime ExpiryTimeUtc { get; set; }
+    }
 
     public class Valera
     {
@@ -19,12 +42,14 @@ namespace web.Models {
         public int CF { get; set; } = 0;
         [Range(0, int.MaxValue)]
         public int MN { get; set; } = 0;
+        
+        public string ValeraOwner { get; set; } = "admin";
 
         public const int maxCF = 10, minCF = -10;
         public Valera() { }
-        public Valera(int hP, int mP, int fT, int cF, int mN, string name = "Valera")
+        public Valera(int hP, int mP, int fT, int cF, int mN, string name = "Valera", string Owner = "admin")
         {
-            HP = hP; MP = mP; FT = fT; MN = mN; CF = cF; Name = name;
+            HP = hP; MP = mP; FT = fT; MN = mN; CF = cF; Name = name; ValeraOwner = Owner;
             stat_checker();
         }
         private void stat_checker() {

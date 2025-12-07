@@ -1,11 +1,67 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using web.Service;
 using web.Models;
 using web.DTOs;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace web.ValeraController
 {
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AuthController : ControllerBase
+    {
+    private readonly IJwtService _authService;
+    private readonly UserManager<IdentityUser> _userManager;
+    private readonly SignInManager<IdentityUser> _signInManager;
+
+    public AuthController(
+        UserManager<IdentityUser> userManager, 
+        SignInManager<IdentityUser> signInManager,
+        IJwtService authService)
+    {
+        _userManager = userManager;
+        _signInManager = signInManager;
+        _authService = authService;
+    }
+        [HttpPost("register")]
+        public async Task<IActionResult> RegUser([FromBody] RegisterDTO model)
+        {
+            var user = new IdentityUser { UserName = model.Username, Email = model.Email};
+            var res = await _userManager.CreateAsync(user, model.Password);
+            if (!res.Succeeded)
+            {
+                return BadRequest(new { Errors = res.Errors.Select(e => e.Description) });
+            }
+            await _userManager.AddToRoleAsync(user, "User");
+            if (user.UserName == "Admin")
+            {
+                await _userManager.AddToRoleAsync(user, "Admin");
+            }
+            var token = await _authService.GenerateToken(user);
+            return Ok(new {Token = token, });
+        }
+        [HttpPost("login")]
+        public async Task<IActionResult> LoginUser([FromBody] LoginDTO model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return Unauthorized( new { Message = "такого пользователя не существует"});
+            }
+            var res = await _userManager.CheckPasswordAsync(user, model.Password);
+            if (!res)
+            {
+                return Unauthorized( new { Message = "неверный пароль"});
+            }
+            var token = await _authService.GenerateToken(user);
+            return Ok(new {Token = token, });
+        }
+    }
+    [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class ValeraController : ControllerBase
@@ -18,7 +74,16 @@ namespace web.ValeraController
         [HttpGet("AllValeras")]
         public async Task<IActionResult> GetValeras()
         {
-            var valeras = await _valeraService.GetAllValeras();
+            var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            IEnumerable<Valera> valeras;
+            if (User.IsInRole("Admin"))
+            {
+               valeras = await _valeraService.GetAllValeras();
+            }
+            else
+            {
+                valeras = await _valeraService.GetValerasByOwner(curUser!);
+            }
             return Ok(valeras);
         }
         [HttpGet("{id}")]
@@ -35,6 +100,7 @@ namespace web.ValeraController
         [HttpPost]
         public async Task<IActionResult> CreateValera([FromBody] ValeraDTO valeraDto)
         {
+            var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
             Valera? valera = null;
             if (valeraDto != null)
             {
@@ -45,7 +111,8 @@ namespace web.ValeraController
                     MP = valeraDto.MP ?? 0,
                     FT = valeraDto.FT ?? 0,
                     CF = valeraDto.CF ?? 0,
-                    MN = valeraDto.MN ?? 0
+                    MN = valeraDto.MN ?? 0,
+                    ValeraOwner = curUser!
                 };
             }
             if (valera == null)
@@ -56,10 +123,11 @@ namespace web.ValeraController
         [HttpGet]
         public async Task<IActionResult> GetValeras([FromQuery] string? search)
         {
+            var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var valeras = await _valeraService.GetAllValeras();
         
             if (!string.IsNullOrEmpty(search))
-                valeras = valeras.Where(v => v.Name.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+                valeras = valeras.Where(v => v.Name.Contains(search, StringComparison.OrdinalIgnoreCase) && v.ValeraOwner == curUser!).ToList();
         
             return Ok(valeras);
         }
