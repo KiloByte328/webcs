@@ -90,6 +90,10 @@ namespace web.ValeraController
         public async Task<IActionResult> GetValeraById(int id)
         {
             var valeras = await _valeraService.GetValeraById(id);
+            if (!User.IsInRole("Admin") || User.Identity.Name != valeras.ValeraOwner)
+            {
+                return Forbid();
+            }
             if (valeras == null)
             {
                 return NotFound();
@@ -101,6 +105,10 @@ namespace web.ValeraController
         public async Task<IActionResult> CreateValera([FromBody] ValeraDTO valeraDto)
         {
             var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (curUser == null)
+            {
+                return Forbid();
+            }
             Valera? valera = null;
             if (valeraDto != null)
             {
@@ -124,6 +132,10 @@ namespace web.ValeraController
         public async Task<IActionResult> GetValeras([FromQuery] string? search)
         {
             var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (curUser == null)
+            {
+                return Forbid();
+            }
             var valeras = await _valeraService.GetAllValeras();
         
             if (!string.IsNullOrEmpty(search))
@@ -134,7 +146,12 @@ namespace web.ValeraController
         [HttpPost("{id}/work")]
         public async Task<IActionResult> ValeraGoToWork(int id)
         {
+            var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var valera = await _valeraService.GetValeraById(id);
+            if (curUser == null || User.IsInRole("Admin") || curUser != valera.ValeraOwner)
+            {
+                return Forbid();
+            }
             if (valera == null)
             {
                 return NotFound();
@@ -147,6 +164,11 @@ namespace web.ValeraController
         public async Task<IActionResult> ValeraGoToTouchGrass(int id)
         {
             var valera = await _valeraService.GetValeraById(id);
+            var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (curUser == null || User.IsInRole("Admin") || curUser != valera.ValeraOwner)
+            {
+                return Forbid();
+            }
             if (valera == null)
             {
                 return NotFound();
@@ -159,6 +181,11 @@ namespace web.ValeraController
         public async Task<IActionResult> ValeraGoToCinema(int id)
         {
             var valera = await _valeraService.GetValeraById(id);
+            var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (curUser == null || User.IsInRole("Admin") || curUser != valera.ValeraOwner)
+            {
+                return Forbid();
+            }
             if (valera == null)
             {
                 return NotFound();
@@ -171,6 +198,11 @@ namespace web.ValeraController
         public async Task<IActionResult> ValeraGoToPub(int id)
         {
             var valera = await _valeraService.GetValeraById(id);
+            var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (curUser == null || User.IsInRole("Admin") || curUser != valera.ValeraOwner)
+            {
+                return Forbid();
+            }
             if (valera == null)
             {
                 return NotFound();
@@ -183,6 +215,11 @@ namespace web.ValeraController
         public async Task<IActionResult> ValeraGoToSleep(int id)
         {
             var valera = await _valeraService.GetValeraById(id);
+            var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (curUser == null || User.IsInRole("Admin") || curUser != valera.ValeraOwner)
+            {
+                return Forbid();
+            }
             if (valera == null)
             {
                 return NotFound();
@@ -195,6 +232,11 @@ namespace web.ValeraController
         public async Task<IActionResult> ValeraGoSingInMetro(int id)
         {
             var valera = await _valeraService.GetValeraById(id);
+            var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (curUser == null || User.IsInRole("Admin") || curUser != valera.ValeraOwner)
+            {
+                return Forbid();
+            }
             if (valera == null)
             {
                 return NotFound();
@@ -207,6 +249,11 @@ namespace web.ValeraController
         public async Task<IActionResult> ValeraGoToDrinkWith(int id)
         {
             var valera = await _valeraService.GetValeraById(id);
+            var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (curUser == null || User.IsInRole("Admin") || curUser != valera.ValeraOwner)
+            {
+                return Forbid();
+            }
             if (valera == null)
             {
                 return NotFound();
@@ -219,6 +266,11 @@ namespace web.ValeraController
         public async Task<IActionResult> DeleteValera(int id)
         {
             var valera = await _valeraService.GetValeraById(id);
+            var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (curUser == null || User.IsInRole("Admin") || curUser != valera.ValeraOwner)
+            {
+                return Forbid();
+            }
             if (valera == null)
             {
                 return NotFound();

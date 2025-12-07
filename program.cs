@@ -79,8 +79,6 @@ public class Program
                     ValidateAudience = true, // Проверять Audience (Для кого)
                     ValidateLifetime = true, // Проверять срок действия (Expires)
                     ValidateIssuerSigningKey = true, // Проверять секретный ключ
-                    
-
                     ValidIssuer = builder.Configuration["Jwt:Issuer"], // Берется из appsettings.json
                     ValidAudience = builder.Configuration["Jwt:Audience"], // Берется из appsettings.json
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString)) // Секретный ключ
