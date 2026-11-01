@@ -17,7 +17,6 @@ namespace web.Models {
     public interface IJwtService
     {
         Task<string> GenerateToken(IdentityUser user); 
-        // Task<TokenResponse> GenerateTokenWithExpiry(IdentityUser user);
     }
 
         public class TokenResponse
@@ -42,9 +41,7 @@ namespace web.Models {
         public int CF { get; set; } = 0;
         [Range(0, int.MaxValue)]
         public int MN { get; set; } = 0;
-        
         public string ValeraOwner { get; set; } = "admin";
-
         public const int maxCF = 10, minCF = -10;
         public Valera() { }
         public Valera(int hP, int mP, int fT, int cF, int mN, string name = "Valera", string Owner = "admin")

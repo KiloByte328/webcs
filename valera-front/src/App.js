@@ -131,6 +131,11 @@ const LoginPage = () => {
   );
 }
 
+const logout = () => {
+  localStorage.setItem('jwtToken', '');
+  window.location.reload();
+}
+
 const HomePage = () => {
   const token = localStorage.getItem('jwtToken');
   if (!token) {
@@ -139,7 +144,7 @@ const HomePage = () => {
   return (
   <div className="App">
   <header className="App-header">
-    Ваши Валеры:
+    <button onClick={logout}> Разлогиниться </button>
     <ValeraSearch />
     <CreateValeraForm onValeraCreated={() => window.dispatchEvent(new Event("valera:updated"))}/>
     <ValeraList />

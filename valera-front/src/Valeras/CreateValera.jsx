@@ -66,7 +66,7 @@ function CreateValeraForm({ onValeraCreated }) {
   return (
     <div style={{ marginBottom: '1rem' }}>
       <button onClick={() => setVisible(!visible)}>
-        {visible ? 'Закрыть форму' : 'Создать новую Валеру'}
+        {visible ? 'Закрыть форму' : 'Создать нового Валеру'}
       </button>
 
       {visible && (

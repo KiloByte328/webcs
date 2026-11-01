@@ -76,6 +76,8 @@ namespace web.ValeraController
         {
             var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
             IEnumerable<Valera> valeras;
+            if (curUser == null)
+                return Forbid();
             if (User.IsInRole("Admin"))
             {
                valeras = await _valeraService.GetAllValeras();
@@ -89,8 +91,13 @@ namespace web.ValeraController
         [HttpGet("{id}")]
         public async Task<IActionResult> GetValeraById(int id)
         {
+            var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var valeras = await _valeraService.GetValeraById(id);
-            if (!User.IsInRole("Admin") || User.Identity.Name != valeras.ValeraOwner)
+            if (curUser == null)
+            {
+                return Forbid();
+            }
+            if (!User.IsInRole("Admin") && curUser != valeras?.ValeraOwner)
             {
                 return Forbid();
             }
@@ -148,7 +155,7 @@ namespace web.ValeraController
         {
             var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var valera = await _valeraService.GetValeraById(id);
-            if (curUser == null || User.IsInRole("Admin") || curUser != valera.ValeraOwner)
+            if (curUser == null || !User.IsInRole("Admin") || curUser != valera.ValeraOwner)
             {
                 return Forbid();
             }
@@ -165,7 +172,7 @@ namespace web.ValeraController
         {
             var valera = await _valeraService.GetValeraById(id);
             var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (curUser == null || User.IsInRole("Admin") || curUser != valera.ValeraOwner)
+            if (curUser == null || !User.IsInRole("Admin") || curUser != valera.ValeraOwner)
             {
                 return Forbid();
             }
@@ -182,7 +189,7 @@ namespace web.ValeraController
         {
             var valera = await _valeraService.GetValeraById(id);
             var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (curUser == null || User.IsInRole("Admin") || curUser != valera.ValeraOwner)
+            if (curUser == null || !User.IsInRole("Admin") || curUser != valera.ValeraOwner)
             {
                 return Forbid();
             }
@@ -199,7 +206,7 @@ namespace web.ValeraController
         {
             var valera = await _valeraService.GetValeraById(id);
             var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (curUser == null || User.IsInRole("Admin") || curUser != valera.ValeraOwner)
+            if (curUser == null || !User.IsInRole("Admin") || curUser != valera.ValeraOwner)
             {
                 return Forbid();
             }
@@ -216,7 +223,7 @@ namespace web.ValeraController
         {
             var valera = await _valeraService.GetValeraById(id);
             var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (curUser == null || User.IsInRole("Admin") || curUser != valera.ValeraOwner)
+            if (curUser == null || !User.IsInRole("Admin") || curUser != valera.ValeraOwner)
             {
                 return Forbid();
             }
@@ -233,7 +240,7 @@ namespace web.ValeraController
         {
             var valera = await _valeraService.GetValeraById(id);
             var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (curUser == null || User.IsInRole("Admin") || curUser != valera.ValeraOwner)
+            if (curUser == null || !User.IsInRole("Admin") || curUser != valera.ValeraOwner)
             {
                 return Forbid();
             }
@@ -250,7 +257,7 @@ namespace web.ValeraController
         {
             var valera = await _valeraService.GetValeraById(id);
             var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (curUser == null || User.IsInRole("Admin") || curUser != valera.ValeraOwner)
+            if (curUser == null || !User.IsInRole("Admin") || curUser != valera.ValeraOwner)
             {
                 return Forbid();
             }
@@ -267,7 +274,7 @@ namespace web.ValeraController
         {
             var valera = await _valeraService.GetValeraById(id);
             var curUser = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (curUser == null || User.IsInRole("Admin") || curUser != valera.ValeraOwner)
+            if (curUser == null || !User.IsInRole("Admin") || curUser != valera.ValeraOwner)
             {
                 return Forbid();
             }

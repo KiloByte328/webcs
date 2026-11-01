@@ -99,13 +99,12 @@ function ValeraList() {
 
   const handleValeraDeleted = () => {
       setSelectedValeraId(null);
-      fetchData(); // Перезагружаем список, чтобы удаленный Валера исчез
+      fetchData();
   }; 
 
   useEffect(() => {
   fetchData();
 
-  // обновлять когда кто-то создаёт нового Валеру
   const handler = () => fetchData();
   window.addEventListener("valera:updated", handler);
 
@@ -122,19 +121,10 @@ function ValeraList() {
   const handleBackClick = () => {
       setSelectedValeraId(null);
   };
-
-  // const HandleLogOut= () => {
-  //   localStorage.setItem('jwtToken', '');
-  //   useNavigatr('/login')
-  // }
-
   const showNoValerasMessage = valeras.length === 0 && !loading;
 
   return (
       <div> 
-        {/* <div>
-        <button onClick={HandleLogOut}>Разлогиниться?</button>
-        </div> */}
           <h2>Список Валер:</h2>
 
           {selectedValeraId !== null ? (
@@ -142,7 +132,6 @@ function ValeraList() {
                   <button onClick={handleBackClick} style={{ marginBottom: '20px' }}>
                       ← Назад к списку
                   </button>
-                  {/* Передаем функцию для возврата к списку после удаления */}
                   <ValeraStats 
                       id={selectedValeraId} 
                       onBack={handleBackClick} 
@@ -152,7 +141,7 @@ function ValeraList() {
 
           ) : (
               showNoValerasMessage ? (
-                <div>Нет Валер 😢</div>
+                <div>Нет Валер </div>
               ) : (
                 valeras.map((v) => (
                     <div 
